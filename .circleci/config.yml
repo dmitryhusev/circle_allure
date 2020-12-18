@@ -27,8 +27,8 @@ jobs:
       - run:
           name: Generate allure report
           command: |
-            allure generate -c alure_result -o sllure-report
+            allure generate -c alure_result -o allure-report
       - store_test_results:
           path: junit_result
       - store_artifacts:
-          path: sllure-report
+          path: allure-report
