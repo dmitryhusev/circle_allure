@@ -28,4 +28,4 @@ def test_smoke_1(browser):
 def test_smoke_2(browser):
     browser.get('https://alib.com.ua')
     make_attachment(browser)
-    assert 0
+    assert 1
