@@ -1,0 +1,30 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/python:3.6.6-stretch-node-browsers
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - run:
+          name: install dependencies
+          command: |
+            python3 -m virtualenv .env
+            source .env/bin/activate
+            pip install -r requirements.txt
+      - run:
+          name: install allure CLI
+          command: |
+            uname -a
+            sudo npm install -g allure-commandline --save-dev
+      - run:
+          name: run tests
+          command: |
+            source .env/bin/activate
+            mkdir test-results
+            python3 -m pytest -n2 -m smoke --junitxml=test-results/result.xml --alluredir ~/repo/raw_test_result
+            allure generate -c ~/repo/raw_test_result -o ~/repo/test-reports
+      - store_test_results:
+          path: test-results
+      - store_artifacts:
+          path: test-reports
