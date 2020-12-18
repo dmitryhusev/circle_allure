@@ -26,8 +26,8 @@ jobs:
             python3 -m pytest -n2 -m smoke --junitxml=junit_result/junit.xml --alluredir=alure_result ./tests
       - run:
           name: Generate allure report
-          command: |
-            allure generate -c alure_result -o allure-report
+          command: allure generate -c alure_result -o allure-report
+          when: always
       - store_test_results:
           path: junit_result
       - store_artifacts:
