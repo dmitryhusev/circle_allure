@@ -23,7 +23,9 @@ jobs:
             source .env/bin/activate
             mkdir test-results
             python3 -m pytest -n2 -m smoke --junitxml=test-results/result.xml --alluredir ~/repo/raw_test_result
-            allure generate -c ~/repo/raw_test_result -o ~/repo/test-reports
+      - run:
+          name: generate allure report
+          command: allure generate -c ~/repo/raw_test_result -o ~/repo/test-reports
       - store_test_results:
           path: test-results
       - store_artifacts:

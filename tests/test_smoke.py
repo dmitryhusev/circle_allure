@@ -1,20 +1,5 @@
 import pytest
-from selenium import webdriver
 from screen import make_attachment
-
-
-@pytest.fixture
-def browser():
-    url = 'http://165.22.87.231:4444/wd/hub'
-    capabilities = {
-        'browserName': 'firefox',
-        'version': '80',
-        'enableVNC': True
-    }
-    driver = webdriver.Remote(url, capabilities)
-    driver.set_window_size(1920, 1080)
-    yield driver
-    driver.quit()
 
 
 @pytest.mark.smoke
