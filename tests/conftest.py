@@ -8,7 +8,7 @@ import pytest
 
 @pytest.fixture
 def browser():
-    url = 'http://46.101.135.82:4444/wd/hub'
+    url = 'http://165.22.87.231:4444/wd/hub'
     capabilities = {
         'browserName': 'firefox',
         'enableVNC': True
