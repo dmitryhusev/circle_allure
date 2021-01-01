@@ -10,7 +10,7 @@ import pytest
 def browser():
     url = 'http://46.101.135.82:4444/wd/hub'
     capabilities = {
-        'browserName': 'firefox',
+        'browserName': 'chrome',
         'enableVNC': True
     }
     driver = webdriver.Remote(url, capabilities)
