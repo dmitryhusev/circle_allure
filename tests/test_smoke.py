@@ -10,4 +10,4 @@ def test_smoke_1(browser):
 @pytest.mark.smoke
 def test_smoke_2(browser):
     browser.get('https://alib.com.ua')
-    assert 1
+    assert 0
