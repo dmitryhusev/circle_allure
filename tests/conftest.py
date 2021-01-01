@@ -12,7 +12,7 @@ def browser():
     url = 'http://46.101.135.82:4444/wd/hub'
     capabilities = {
         'browserName': 'firefox',
-        # 'version': '80',
+        'version': '80',
         'enableVNC': True
     }
     driver = webdriver.Remote(url, capabilities)
