@@ -1,7 +1,10 @@
-pytest
-selenium
-pytest-html
-allure-pytest
-pytest-rerunfailures
-pytest-testconfig
-pytest-xdist
+faker==5.5.1
+allure-pytest==2.8.31
+pytest==6.2.1
+selenium==3.141.0
+openpyxl==3.0.5
+pytest-xdist==2.2.0
+requests==2.25.1
+pytest-rerunfailures==9.1.1
+urllib3==1.26.2
+decorator==4.4.2
