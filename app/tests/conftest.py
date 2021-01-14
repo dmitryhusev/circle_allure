@@ -4,17 +4,22 @@ from allure_commons.types import AttachmentType
 from selenium.common.exceptions import WebDriverException
 from selenium import webdriver
 import pytest
+from app.src import settings
 
 
 @pytest.fixture
 def browser():
-    url = 'http://165.22.87.231:4444/wd/hub' # selenoid on digitalocean
-    capabilities = {
-        'browserName': 'firefox',
-        'enableVNC': True
-    }
-    driver = webdriver.Remote(url, capabilities)
-    driver.set_window_size(1920, 1080)
+    if settings.RUN_LOCALLY:
+        driver = webdriver.Firefox()
+        driver.maximize_window()
+    else:
+        url = 'http://165.22.87.231:4444/wd/hub'  # selenoid on digitalocean
+        capabilities = {
+            'browserName': 'firefox',
+            'enableVNC': True
+        }
+        driver = webdriver.Remote(url, capabilities)
+        driver.set_window_size(1920, 1080)
     yield driver
     driver.quit()
 

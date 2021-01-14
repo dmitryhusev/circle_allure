@@ -7,7 +7,7 @@ from selenium.common.exceptions import (
     ElementClickInterceptedException as Ecie,
     ElementNotInteractableException as Enie,
     StaleElementReferenceException as Sere,
-    UnexpectedAlertPresentException as Uape,)
+)
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as ec
@@ -24,21 +24,18 @@ def open_page(browser, url='', full=False):
         browser.get(BASE_URL + url)
 
 
-def page_title(browser, *titles, timeout=15):
-    wait = WebDriverWait(browser, timeout)
-    for title in titles:
-        try:
-            wait.until(lambda x: title == x.title)
-            return True
-        except (Toe, Uape):
-            continue
-    message = f'{titles} is/are not in {browser.title}'
-    raise Toe(message)
+def page_title(browser, title, timeout=15):
+    try:
+        WebDriverWait(browser, timeout).until(lambda x: title == x.title)
+        return True
+    except Toe:
+        message = f'{title} is/are not in {browser.title}'
+        raise Toe(message)
 
 
 class BasePage:
 
-    # WAIT = '//div[@class="Select-menu-outer"]'
+    # every app page should inherit this page
 
     def __init__(self, browser):
         self.browser = browser
@@ -47,22 +44,30 @@ class BasePage:
         self.browser.close()
         self.browser.switch_to.window(self.browser.window_handles[-1])
 
-    def text_on_page(self, text, timeout=30):
+    def text_on_page(self, text, timeout=TIMEOUT):
         wait = WebDriverWait(self.browser, timeout)
+        msg = f'Text "{text}" is not displayed on the page'
+        locator = f'//*[contains(text(), "{text}")]'
         try:
-            msg = f'Text "{text}" is not displayed on the page'
-            loc = '//*[contains(text(), "%s")]' % text
-            wait.until(lambda x: x.find_element_by_xpath(loc), msg)
+            wait.until(lambda x: x.find_element_by_xpath(locator), msg)
             return True
         except Toe:
             raise
 
-    def no_text_on_page(self, text, timeout=15):
-        locator = '//*[contains(text(), "%s")]' % text
+    def absence_element(self, locator, timeout=TIMEOUT):
+        wait = WebDriverWait(self.browser, timeout, ignored_exceptions=Sere)
+        try:
+            wait.until_not(lambda x: x.find_element_by_xpath(locator).is_displayed())
+            return True
+        except Toe:
+            raise exp.ElementFoundException(f'Unexpected element is present: {locator}')
+
+    def no_text_on_page(self, text, timeout=TIMEOUT):
+        locator = f'//*[contains(text(), "{text}")]'
         return self.absence_element(locator, timeout)
 
     def get_text(self, locator, lower=False, timeout=TIMEOUT):
-        for _ in range(3):
+        for _ in range(5):
             try:
                 text = self.element(locator, timeout=timeout).text
                 return text.lower() if lower else text
@@ -78,7 +83,7 @@ class BasePage:
 
     def text_in_attribute(self, locator, text, attribute):
         # checking if text (e.g. "helloworld") is present in attribute ("src")
-        # e.g: <img src="helloworld.jpg">
+        # like that: <img src="helloworld.jpg">
 
         attribute_value = self.element(locator).get_attribute(attribute)
         if text in attribute_value:
@@ -103,44 +108,26 @@ class BasePage:
                 counter += 1
         raise ValueError(f'This element {locator} should have some value')
 
-    def enter_text_via_js(self, locator, text):
-        # TODO: seems not needed
-        self.browser.execute_script(f'arguments[0].value="{text}"', self.element(locator))
-
     def attach_item(self, locator, path, name):
-        # base functionality for attaching images, pdf, xls
-
         path = path if path.startswith('/') else '/' + path
         path_to_file = f'{os.getcwd()}{Path(path, name)}'
         self.enter_text(locator, path_to_file)
 
     def refresh_to_find(self, locator, timeout=10, times=3):
-        counter = 0
-        while counter < times:
+        for time in range(times):
             try:
                 return self.element(locator, timeout=timeout)
             except Toe:
-                counter += 1
                 self.browser.refresh()
         raise Toe(msg=f'Element {locator} not found')
 
     def refresh_not_to_find(self, locator, timeout=10, times=3):
-        counter = 0
-        while counter < times:
+        for time in range(times):
             try:
                 return self.absence_element(locator, timeout=timeout)
             except exp.ElementFoundException:
-                counter += 1
                 self.browser.refresh()
         raise exp.ElementFoundException(f'Unexpected element is present: {locator}')
-
-    # def choose_item_from_list(self, locator, value, to_wait=WAIT):
-    #     # example: city/country while creating demand
-    #
-    #     self.enter_text(locator, Keys.DELETE)
-    #     self.enter_text(locator, value)
-    #     self.text_in_element(to_wait, value)
-    #     self.enter_text(locator, Keys.ENTER)
 
     def element(self, locator, timeout=TIMEOUT):
         """
@@ -153,8 +140,7 @@ class BasePage:
         message = f'Element not found: {locator}'
         wait = WebDriverWait(self.browser, timeout, ignored_exceptions=Sere)
         try:
-            return wait.until(lambda x: x.find_element_by_xpath(locator),
-                              message)
+            return wait.until(lambda x: x.find_element_by_xpath(locator), message)
         except Toe:
             raise
 
@@ -177,16 +163,6 @@ class BasePage:
             return self.get_text(locator)
         except Toe:
             raise
-
-    def absence_element(self, locator, timeout=15):
-        # Returns true if element is not visible or not found
-
-        wait = WebDriverWait(self.browser, timeout, ignored_exceptions=Sere)
-        try:
-            wait.until_not(lambda x: x.find_element_by_xpath(locator).is_displayed())
-            return True
-        except Toe:
-            raise exp.ElementFoundException(f'Unexpected element is present: {locator}')
 
     def click(self, locator, locator_to_wait=None, timeout=10, duration=35):
         # tries to click on web element
