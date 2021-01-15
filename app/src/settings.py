@@ -11,4 +11,5 @@ URLS = {
 BASE_URL = os.getenv('ENV') if os.getenv('ENV') else URLS.get('stage')
 
 USER_EMAIL = 'dmytro@emissary.io'
+
 USER_PASSWORD = os.getenv('USER_PASSWORD')
