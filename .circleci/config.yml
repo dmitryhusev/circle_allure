@@ -1,4 +1,8 @@
-version: 2
+version: 2.1
+
+orbs:
+  slack: circleci/slack@4.2.0
+
 jobs:
   build:
     docker:
@@ -31,7 +35,8 @@ jobs:
           path: junit_result
       - store_artifacts:
           path: allure-report
-      - notify:
-          webhooks:
-            -url: https://hooks.slack.com/services/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
-
+      - slack/notify:
+          color: '#42e2f4'
+          mentions: 'CDUNJPPL2'
+          message: This is a custom message notification
+          webhook: https://hooks.slack.com/services/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
